@@ -1,5 +1,5 @@
 import React from 'react';
-import tanksArr from './Tanks'
+import axios from 'axios'
 import './App.css';
 
 class App extends React.Component {
@@ -7,7 +7,7 @@ class App extends React.Component {
     super()
 
     this.state = {
-      tanks: tanksArr,
+      tanks: [],
       name: '',
       gun: {
         production: '',
@@ -17,8 +17,38 @@ class App extends React.Component {
       lovedByScott: false,
       img: '',
       coolTankRating: null,
-      wars: []
+      wars: [],
+      search: ''
     }
+
+    this.handleUpdateSearch = this.handleUpdateSearch.bind(this)
+    this.searchTanks = this.searchTanks.bind(this)
+  }
+
+  componentDidMount(){
+    axios.get('/api/tanks')
+    .then(res => {
+      this.setState({
+        tanks: res.data
+      })
+    })
+    .catch(err => console.log(err))
+  }
+
+  handleUpdateSearch(val){
+    this.setState({
+      search: val
+    })
+  }
+
+  searchTanks(){
+    axios.get(`/api/tanks?search=${this.state.search}`)
+    .then(res => {
+      this.setState({
+        tanks: res.data
+      })
+    })
+    .catch(err => console.log(err))
   }
 
   handleUpdateName = val => {
@@ -104,6 +134,9 @@ class App extends React.Component {
     return (
     <main>
       <h1>Scott's Legendary Tank Builder</h1>
+      <input placeholder='Search Here' 
+      onChange={e => this.handleUpdateSearch(e.target.value)}/>
+      <button onClick={this.searchTanks}>Search Tanks</button>
 
       <section>
         <input 
